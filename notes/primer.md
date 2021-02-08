@@ -25,7 +25,7 @@
         - 2 Async paradigms -
             - Doing time-consuming work in advance and serving the completed work with low request time. Example - turn dynamic content to static.
             - Handling “new” tasks asynchronously - A user comes to your website and starts a very computing-intensive task that would take several minutes to finish. So the frontend of your website sends a job onto a job queue and immediately signals back to the user: your job is at work, please continue to browse the page. The job queue is constantly checked by a bunch of workers for new jobs. If there is a new job then the worker does the job and after some minutes sends a signal that the job was done. The frontend, which constantly checks for a new “job is done” - signals, sees that the job was done and informs the user about it.
-            
+
 2. [CS75 David Malan video](https://www.youtube.com/watch?v=-W9F__D3oY4)
     - Web Hosts:
         - Features-
@@ -87,10 +87,10 @@
         - *Consistency - Read is guaranteed to return the most recent write.*
         - *Availability - Non-failing nodes will return a reasonable response within a reasonable amount of time.*
         - *Partition Tolerance - The system functions normally when a partition occurs.*
-        - According to the [Fallacy of Distributed computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing), networks aren’t reliable. Hence we must tolerate partitions in the network. So we are left with only ⅔ options that are consistent and available.
-
+        
         ![Image 1](../assets/1.png)
-
+    
+    - According to the [Fallacy of Distributed computing](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing), networks aren’t reliable. Hence we must tolerate partitions in the network. So we are left with only ⅔ options that are consistent and available.
     - **Choose either among the following -**
         - CP - consistency and partition tolerance - Waiting for a response from the partitioned node might result in a timeout error. ***CP is a good choice if your business requires atomic reads and writes.***
         - AP - availability, and partition - Responses return the most readily available version of the data available on any node, which might not be the latest. Writes might take some time to propagate when the partition is resolved. ***AP is a good choice if the business needs allow for eventual consistency or when the system needs to continue working despite external errors.***
