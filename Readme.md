@@ -1,4 +1,4 @@
-## Everything about System Design, Scalability and Distributed Systems
+## System Design Primer Notes
 
 1. Scalability blog posts summary
 2. CS75 talk summary
