@@ -25,6 +25,7 @@
         - 2 Async paradigms -
             - Doing time-consuming work in advance and serving the completed work with low request time. Example - turn dynamic content to static.
             - Handling “new” tasks asynchronously - A user comes to your website and starts a very computing-intensive task that would take several minutes to finish. So the frontend of your website sends a job onto a job queue and immediately signals back to the user: your job is at work, please continue to browse the page. The job queue is constantly checked by a bunch of workers for new jobs. If there is a new job then the worker does the job and after some minutes sends a signal that the job was done. The frontend, which constantly checks for a new “job is done” - signals, sees that the job was done and informs the user about it.
+            
 2. [CS75 David Malan video](https://www.youtube.com/watch?v=-W9F__D3oY4)
     - Web Hosts:
         - Features-
@@ -74,11 +75,13 @@
             - active + passive pair of load balancers, passive promotes itself when receives no more packets from the active one. and send packets to each other
         - **Partitioning -** A-M cluster and O-Z cluster
         - **High Availability -** One load balancer, two master replicating each other
+
 3. Performance vs Scalability ***[Everything is a tradeoff]***
     - Any service is scalable if it results in increased performance proportional to the resources added. (As we increase resources, the performance has to increase).
     - **Performance merely means serving more units of work or it can also mean handling larger units of work when datasets grow**
     - If your system is low on performance; it means your system is slow for a single user.
     - If you cannot scale up your system; it means your system is fast for single users but fails to respond/gets slow under heavy load/traffic/concurrent requests.
+
 4. CAP Theorem
     - You can only have two out of the following three guarantees across a write/read pair: Consistency, Availability, and Partition Tolerance - one of them must be a sacrifice
         - *Consistency - Read is guaranteed to return the most recent write.*
@@ -118,10 +121,11 @@
 
                 ![Image 4](../assets/4.png)
 
-        - Availability decreases when both the components having availability < 100% are connected in series. Whereas if they are connected in parallel the cumulative availability increases.
-        - For components in series: Total availability = availability(A) * availability(B)
-        - For components in parallel: Total availability = 1 - (1 - Availability (A)) * (1 - Availability (B))
-        - [Scalability, availability and stability patterns](https://www.slideshare.net/jboner/scalability-availability-stability-patterns)
+    - Availability decreases when both the components having availability < 100% are connected in series. Whereas if they are connected in parallel the cumulative availability increases.
+    - For components in series: Total availability = availability(A) * availability(B)
+    - For components in parallel: Total availability = 1 - (1 - Availability (A)) * (1 - Availability (B))
+    - [Scalability, availability and stability patterns](https://www.slideshare.net/jboner/scalability-availability-stability-patterns)
+  
 5. DNS
     - A hierarchical system with authoritative servers at the top level. Router/isp provides information about which DNS server to reach out to for lookup. Lower level DNS mappings become stale due to DNS propagation delays. DNS results can also be cached which is determined by Time to live (TTL)
     - Routing traffic through different mechanisms -
