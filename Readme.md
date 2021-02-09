@@ -12,3 +12,4 @@
 
 - [ ] latency vs throughput in section 3
 - [ ] DNS articles pending
+- [ ] Clean up the research papers section with a separate readme
