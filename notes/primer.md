@@ -138,8 +138,53 @@
 - [Scalability, availability and stability patterns](https://www.slideshare.net/jboner/scalability-availability-stability-patterns)
   
 ## DNS
+
+- **Domain name ⇒ IP Address mapping.**
 - A hierarchical system with authoritative servers at the top level. Router/isp provides information about which DNS server to reach out to for lookup. Lower level DNS mappings become stale due to DNS propagation delays. DNS results can also be cached which is determined by Time to live (TTL)
+    - **NS record (name server)** - Specifies the DNS servers for your domain/subdomain.
+    - **MX record (mail exchange)** - Specifies the mail servers for accepting messages.
+    - **A record (address)** - Points a name to an IP address.
+    - **CNAME (canonical)** - Points a name to another name or `CNAME` (example.com to [www.example.com](http://www.example.com/)) or to an `A` record.
 - Routing traffic through different mechanisms -
     - Weighted Round Robin - Focuses on fairly distributing the load and not equally distributing the load. It maintains a balance between varying cluster sizes.
     - Latency-based - If the application is hosted in multiple regions, we can provide users with the quickest response time based on the region that provides the lowest latency.
     - Geolocation-based - Geolocation routing lets you choose the resources that serve your traffic based on the geographic location of your users.
+- **Disadvatanges -**
+    - Accessing a DNS server introduces slight delay. (Can be mitigated by caching)
+    - DNS server management is complex.
+
+## CDN
+
+- Distributed network of proxy servers serving content to users from locations closer to them.
+- Generally CDN's serve static files. Although, some CDN's(Amazon CloudFrount) supports dynamic content.
+- Helps speeding up static components of a website by distributing them across a number of servers around the world.
+- **Advantages -**
+    - Users receive content from data centers close to them.
+    - Servers don't serve requests which the CDN fulfills.
+- **Push Based CDN's** -
+    - You are solely responsible for pushing **new content to CDN** when changes occur on the server. You are responsible for providing new content, rewriting URLs to point to new changes made on CDN. Also, you are responsible for configuring when the content expires and when it is updated. The content is only updated when changes happen on the server. This minimizes traffic but maximizes storage.
+    - Websites having less traffic / less frequent changes work well with Push CDN. Entire content is placed on the CDN once instead of being repulled again and again.
+- **Pull Based CDN's -**
+    - They grad content from the server when the first user requests content. The content resides on your server and we rewrite URLs to point to the CDN. ⇒ Results in a slower request until caching is exercised on the CDN.
+    - TTL determines how long content is cached. They minimize storage space on CDN but they are vulnerable to redundant traffic. (If TTL expires and the files are pulled before they have actually changed)
+    - Websites having heavy traffic / more frequently requested content changes work well with Pull CDN. Only the recently-requested content is placed on the CDN.
+- **Disadvantages -**
+    - CDN costs are directly proportional to traffic that you receive.
+    - Content can become stale if there is an update before TTL expiry.
+- [Difference between Pull and Push CDN](http://www.travelblogadvice.com/technical/the-differences-between-push-and-pull-cdns/)
+
+## Load Balancer
+
+- Distributed incoming requests to different servers/computing resources. Load balancers are useful in preventing requests from going to unhealthy servers, preventing overloading resources, and helping eliminate the single point of failure. Additional benefits are SSL termination and session persistence.
+- **Different algorithms based on different metrics for routing traffic requests -**
+    - **Layer 4** - They look for information/packet at the transport layer of the TCP/IP stack to determine how to distribute requests. They can understand source + destination IP address, ports, but not the content of the packet. The forward packet to and from the upstream server, performing a network address translation(NAT).
+    - **Layer 7** - They look at the application layer to decide how to distribute requests. This involves the message, contents of the header, and cookies. They terminate network traffic, read messages, perform load-balancing by opening connections to a server.
+    - **Round Robin/Weighted Round Robin** - Uses a round-robin algorithm where you go by a fixed turn to each server and keep distributing requests to them. Weighted Round Robin works in an efficient manner by assigning weights(depending on the server capacity) to each server and then distributing the load respectively.
+    - Session/Cookies
+    - Random
+    - Least loaded
+- **Disadvantages -**
+    - Can become a bottleneck if it doesn't have enough resources or if its misconfigured.
+    - More complexity.
+    - Single load balancer is single point of failure, including multiple backup or master load balancers further increases complexity.
+- **[Nginx Architecture](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/) - notes remaining**
