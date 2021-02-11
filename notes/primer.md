@@ -177,8 +177,17 @@
 
 - Distributed incoming requests to different servers/computing resources. Load balancers are useful in preventing requests from going to unhealthy servers, preventing overloading resources, and helping eliminate the single point of failure. Additional benefits are SSL termination and session persistence.
 - **Different algorithms based on different metrics for routing traffic requests -**
-    - **Layer 4** - They look for information/packet at the transport layer of the TCP/IP stack to determine how to distribute requests. They can understand source + destination IP address, ports, but not the content of the packet. The forward packet to and from the upstream server, performing a network address translation(NAT).
-    - **Layer 7** - They look at the application layer to decide how to distribute requests. This involves the message, contents of the header, and cookies. They terminate network traffic, read messages, perform load-balancing by opening connections to a server.
+    - **Layer 4** -
+        - They look for information/packet at the transport layer of the TCP/IP stack to determine how to distribute requests.
+        - They can understand source + destination IP address, ports, but not the content of the packet.
+        - For the source, the destination IP address is the load balancer's address in this case. And when the load balancer receives this IP address, it performs Network Address Translation(NAT) and changes the destination IP address to address of content server. Similarly while sending the response back to client the load balancer performs a NAT and changes destination IP address to that of source IP address.
+        - The layer 4 load balancer is usually a dedicated hardware device supplied by a vendor and runs proprietary load balancing software. Also, the NAT operations are performed by chips instead of the software.
+        - Uses raw TCP for sending packets.
+    - **Layer 7 (reverse proxy)** -
+        - They look at the application layer to decide how to distribute requests. This involves the message, contents of the header, and cookies.
+        - They terminate network traffic, read messages, perform load-balancing by opening connections to a server.
+        - Load balancing at layer 7 is more CPU intensive. It uses buffering to offload slow connections from upstream servers which improve performance.
+        - It routes traffic in a much more sophisticated manner particularly applicable to TCP-based traffic such as HTTP.
     - **Round Robin/Weighted Round Robin** - Uses a round-robin algorithm where you go by a fixed turn to each server and keep distributing requests to them. Weighted Round Robin works in an efficient manner by assigning weights(depending on the server capacity) to each server and then distributing the load respectively.
     - Session/Cookies
     - Random
@@ -187,4 +196,9 @@
     - Can become a bottleneck if it doesn't have enough resources or if its misconfigured.
     - More complexity.
     - Single load balancer is single point of failure, including multiple backup or master load balancers further increases complexity.
-- **[Nginx Architecture](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/) - notes remaining**
+- **[Nginx Architecture](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)**
+- **Layer 4 vs Layer 7 load balancing**
+
+    ![Image 5](../assets/5.png)
+
+- [Configuring listeners for load balancers](http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
