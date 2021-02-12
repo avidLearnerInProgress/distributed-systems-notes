@@ -202,3 +202,21 @@
     ![Image 5](../assets/5.png)
 
 - [Configuring listeners for load balancers](http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
+
+## Reverse Proxy
+
+- Web server that focuses on providing unified interface to the outside world and centralizes the internal services.
+- When a client requests for data, he is exposed to common public IP address that belongs to the reverse proxy. The actual backend IP address of different servers are not being exposed. This results in better security on the backend servers. While returning a response to user from the client, the reverse proxy changes the source IP address from server's address to its IP address. This creates a proxy layer in front of actual backend servers that exist. Hence its called a reverse proxy.
+- Benefits of Reverse Proxy -
+    - Increased security - Hide information about backend servers, blacklist IPs, limit number of connections per client
+    - Increased scalability and flexibility - Clients only see the reverse proxy's IP, allowing you to scale servers or change their configuration
+    - SSL termination - Decrypt incoming requests and encrypt server responses so backend servers do not have to perform these potentially expensive operations
+    - Removes the need to install X.509 certificates on each server
+    - Compression - Compress server responses
+    - Caching - Return the response for cached requests
+    - Static content - Serve static content directly
+- **Disadvantages -**
+    - More complexity.
+    - Single reverse proxy - Single point of failure
+- Load balancer vs Reverse proxy -
+    - Load balancer is designed to route traffic to different servers whereas reverse proxy works as a camouflaging layer to not expose the actual backend servers.
