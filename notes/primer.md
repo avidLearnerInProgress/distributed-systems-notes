@@ -145,13 +145,13 @@
     - **MX record (mail exchange)** - Specifies the mail servers for accepting messages.
     - **A record (address)** - Points a name to an IP address.
     - **CNAME (canonical)** - Points a name to another name or `CNAME` (example.com to [www.example.com](http://www.example.com/)) or to an `A` record.
-- Routing traffic through different mechanisms -
-    - Weighted Round Robin - Focuses on fairly distributing the load and not equally distributing the load. It maintains a balance between varying cluster sizes.
-    - Latency-based - If the application is hosted in multiple regions, we can provide users with the quickest response time based on the region that provides the lowest latency.
-    - Geolocation-based - Geolocation routing lets you choose the resources that serve your traffic based on the geographic location of your users.
-- **Disadvatanges -**
-    - Accessing a DNS server introduces slight delay. (Can be mitigated by caching)
-    - DNS server management is complex.
+- **How does the mapping work internally -**
+    - When you hit [www.google.com](http://www.google.com/) in the browser, you are actually visiting [www.google.com](http://www.google.com/). (a dot at the end.). The dot at the end represents the **root of the internet namespace**.
+    - The browser checks its cache to fetch the IP address of the domain name. If it doesn't know it approaches the OS to check if it's present in the OS cache or memory. If not, then the OS is capable of asking a **Resolving Name Server** what the IP address is. The Resolving name server interacts with the DNS. It is configured manually or programmed. It may or may not have the IP address in the cache. The only thing that a resolving Name Server should know is the root of the namespace of the internet.
+    - Now, the top-level name servers are the **com** name servers or the **TLD (Top Level Domain) Name servers**. The root name servers reply with a response (Do not know the IP but do know the com name servers). So, the resolving name server takes the info from the root name server, puts it in the cache, and goes to the com name server. When the resolving name server goes to the com name server, it replies with the address of the **example.com name servers**. Now, the resolving name server takes this info and goes to the example.com name servers. These are the **Authoritative Name servers** for this particular domain name.
+    - **How did the com TLD name servers know which authoritative name servers to use?** It does so with the help of the **Domain Registrar.** When a domain is purchased, the registrar is told which authoritative name servers that domain should use. The resolving name server takes the response from the TLD, queries the example.com name server. This server gets the IP from the authoritative name server, puts it in the cache, and gives it to the OS. The browser then gets the IP from the OS. The whole process works in the blink of an eye!
+- [DNS Explained](https://www.youtube.com/watch?v=72snZctFFtA)
+- [AWS ReInvent talk on DNS:](https://www.youtube.com/watch?v=e2xLV7pCOLI) (watch first 6 minutes)
 
 ## CDN
 
