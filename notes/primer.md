@@ -150,8 +150,26 @@
     - The browser checks its cache to fetch the IP address of the domain name. If it doesn't know it approaches the OS to check if it's present in the OS cache or memory. If not, then the OS is capable of asking a **Resolving Name Server** what the IP address is. The Resolving name server interacts with the DNS. It is configured manually or programmed. It may or may not have the IP address in the cache. The only thing that a resolving Name Server should know is the root of the namespace of the internet.
     - Now, the top-level name servers are the **com** name servers or the **TLD (Top Level Domain) Name servers**. The root name servers reply with a response (Do not know the IP but do know the com name servers). So, the resolving name server takes the info from the root name server, puts it in the cache, and goes to the com name server. When the resolving name server goes to the com name server, it replies with the address of the **example.com name servers**. Now, the resolving name server takes this info and goes to the example.com name servers. These are the **Authoritative Name servers** for this particular domain name.
     - **How did the com TLD name servers know which authoritative name servers to use?** It does so with the help of the **Domain Registrar.** When a domain is purchased, the registrar is told which authoritative name servers that domain should use. The resolving name server takes the response from the TLD, queries the example.com name server. This server gets the IP from the authoritative name server, puts it in the cache, and gives it to the OS. The browser then gets the IP from the OS. The whole process works in the blink of an eye!
-- [DNS Explained](https://www.youtube.com/watch?v=72snZctFFtA)
-- [AWS ReInvent talk on DNS:](https://www.youtube.com/watch?v=e2xLV7pCOLI) (watch first 6 minutes)
+- DNS Explained: [https://www.youtube.com/watch?v=72snZctFFtA](https://www.youtube.com/watch?v=72snZctFFtA)
+- AWS ReInvent talk on DNS: [https://www.youtube.com/watch?v=e2xLV7pCOLI](https://www.youtube.com/watch?v=e2xLV7pCOLI) (watch first 6 minutes)
+    - 
+
+        ![Image 5](../assets/5.png)
+
+- DNS Zone - It is a specific portion of the DNS namespace that is managed by an organization or administrator. A DNS zone starts at a domain within the tree and can also extend down into subdomains so that multiple subdomains can be managed by one entity.
+    - 
+
+        ![Image 6](../assets/6.png)
+
+    - **DNS Zone file -** A text file that contains an actual representation of the zone and contains all the records that exist for all the domains within that zone. They always start with a Start of Authority (SOA) record containing important info about the zone administrator.
+- Routing traffic through different mechanisms -
+    - Weighted Round Robin - Focuses on fairly distributing the load and not equally distributing the load. It maintains a balance between varying cluster sizes.
+    - Latency-based - If the application is hosted in multiple regions, we can provide users with the quickest response time based on the region that provides the lowest latency.
+    - Geolocation-based - Geolocation routing lets you choose the resources that serve your traffic based on the geographic location of your users.
+    - Many more routing mechanisms - [https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html)
+- **Disadvatanges -**
+    - Accessing a DNS server introduces slight delay. (Can be mitigated by caching)
+    - DNS server management is complex.
 
 ## CDN
 
@@ -163,15 +181,34 @@
     - Servers don't serve requests which the CDN fulfills.
 - **Push Based CDN's** -
     - You are solely responsible for pushing **new content to CDN** when changes occur on the server. You are responsible for providing new content, rewriting URLs to point to new changes made on CDN. Also, you are responsible for configuring when the content expires and when it is updated. The content is only updated when changes happen on the server. This minimizes traffic but maximizes storage.
-    - Websites having less traffic / less frequent changes work well with Push CDN. Entire content is placed on the CDN once instead of being repulled again and again.
+    - When to use? Websites having less traffic / less frequent changes work well with Push CDN. Entire content is placed on the CDN once instead of being repulled again and again.
 - **Pull Based CDN's -**
     - They grad content from the server when the first user requests content. The content resides on your server and we rewrite URLs to point to the CDN. ⇒ Results in a slower request until caching is exercised on the CDN.
     - TTL determines how long content is cached. They minimize storage space on CDN but they are vulnerable to redundant traffic. (If TTL expires and the files are pulled before they have actually changed)
-    - Websites having heavy traffic / more frequently requested content changes work well with Pull CDN. Only the recently-requested content is placed on the CDN.
+    - When to use? Websites having heavy traffic / more frequently requested content changes work well with Pull CDN. Only the recently-requested content is placed on the CDN.
 - **Disadvantages -**
     - CDN costs are directly proportional to traffic that you receive.
     - Content can become stale if there is an update before TTL expiry.
+- Examples of CDN - Akamai, CloudFront
 - [Difference between Pull and Push CDN](http://www.travelblogadvice.com/technical/the-differences-between-push-and-pull-cdns/)
+- **How does a CDN work -**
+    - At its core, its a network of servers linked together with the goal of delivering content quickly, reliably and securely. It places servers at the exchange points between different networks.
+    - These Internet Exchange Points (An Internet exchange point (IXP) is a physical location through which Internet infrastructure companies such as Internet Service Providers (ISPs) and [CDN](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/)s connect with each other. These locations exist on the [“edge” of different networks](https://www.cloudflare.com/learning/cdn/glossary/edge-server/),) are primary locations where different networks connect to give each other access to traffic originating from their respective networks. By having access to these high speed locations a CDN provider is capable of reducing costs and transit times for data.
+
+    ![Image 7](../assets/7.png)
+
+- **How does CDN improve load times -**
+    - **Reduces distance between users and website resources**. It connects the users to a geographically closer data center. Less travel, faster service.
+    - Hardware optimizations like **efficient load balancing** and using **solid state drives** help data reach the user faster.
+    - Can reduce the amount of data travelled, by **reducing file size through minification and compression**. Small size, quick load times.
+    - Speed up sites that use TLS/SSL certificates by **optimizing connection reuse and enabling TLS false start**.
+- **How does a CDN keep a website always available -**
+    - **Load balancing** distributes traffic across CDN servers evenly - this helps in handling sudden spikes in traffic.
+    - **Intelligent Failover** - even if one or more CDN servers go offline, the failover can redistribute the traffic to other operational servers.
+    - If an entire data center is down, **Anycast routing** transfers traffic to another available data center. (Most of the internet works on unicast - means that all the requests are directed to a specific data center. When anycast is used, the network is more resilient especially in cases of a DDoS attack, because, the traffic will find the best path and will automatically flow to a proximal other data center)
+    - 
+
+        ![Image 8](../assets/8.png)
 
 ## Load Balancer
 
@@ -199,24 +236,26 @@
 - **[Nginx Architecture](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)**
 - **Layer 4 vs Layer 7 load balancing**
 
-    ![Image 5](../assets/5.png)
+    ![Image 9](../assets/9.png)
 
 - [Configuring listeners for load balancers](http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
 
-## Reverse Proxy
+## Reverse Proxy
 
-- Web server that focuses on providing unified interface to the outside world and centralizes the internal services.
-- When a client requests for data, he is exposed to common public IP address that belongs to the reverse proxy. The actual backend IP address of different servers are not being exposed. This results in better security on the backend servers. While returning a response to user from the client, the reverse proxy changes the source IP address from server's address to its IP address. This creates a proxy layer in front of actual backend servers that exist. Hence its called a reverse proxy.
-- Benefits of Reverse Proxy -
-    - Increased security - Hide information about backend servers, blacklist IPs, limit number of connections per client
-    - Increased scalability and flexibility - Clients only see the reverse proxy's IP, allowing you to scale servers or change their configuration
-    - SSL termination - Decrypt incoming requests and encrypt server responses so backend servers do not have to perform these potentially expensive operations
-    - Removes the need to install X.509 certificates on each server
-    - Compression - Compress server responses
-    - Caching - Return the response for cached requests
-    - Static content - Serve static content directly
-- **Disadvantages -**
-    - More complexity.
-    - Single reverse proxy - Single point of failure
-- Load balancer vs Reverse proxy -
-    - Load balancer is designed to route traffic to different servers whereas reverse proxy works as a camouflaging layer to not expose the actual backend servers.
+- A web server that focuses on providing a unified interface to the outside world and centralizes the internal services.
+- When a client requests data, he is exposed to a common public IP address that belongs to the reverse proxy.
+- The actual backend IP addresses of different servers are not being exposed. This results in better security on the backend servers.
+- While returning a response to the user from the client, the reverse proxy changes the source IP address from the server's address to its IP address.
+- This creates a proxy layer in front of actual backend servers that exist. Hence it's called a reverse proxy.
+- Benefits of Reverse Proxy -
+    - Increased security - Hide information about backend servers, blacklist IPs, limit number of connections per client
+    - Increased scalability and flexibility - Clients only see the reverse proxy's IP, allowing you to scale servers or change their configuration
+    - SSL termination - Decrypt incoming requests and encrypt server responses so backend servers do not have to perform these potentially expensive operations
+    - Removes the need to install X.509 certificates on each server
+    - Compression - Compress server responses
+    - Caching - Return the response for cached requests
+    - Static content - Serve static content directly
+- **Disadvantages -**
+    - More complexity.
+    - Single reverse proxy - Single point of failure
+- **Load balancer vs Reverse proxy - Load balancer is designed to route traffic to different servers whereas reverse proxy works as a camouflaging layer to not expose the actual backend servers.**
