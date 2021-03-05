@@ -7,11 +7,10 @@
 - [x] [DNS](./notes/primer.md#DNS)
 - [x] [CDN](./notes/primer.md#CDN)
 - [x] [Load Balancer](./notes/primer.md#Load-Balancer)
-
+- [x] [Reverse Proxy](./notes/primer.md#Reverse-Proxy)
 
 ## Todo -
 
-- [ ] latency vs throughput in section 3
-- [ ] DNS articles pending
-- [ ] Load balancer articles (Nginx architecture important) pending 
+- [x] DNS articles pending
+- [ ] Databases + sharding pending
 - [ ] Clean up the research papers section with a separate readme
