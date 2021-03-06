@@ -134,7 +134,6 @@
 - Availability decreases when both the components having availability < 100% are connected in series. Whereas if they are connected in parallel the cumulative availability increases.
 - For components in series: Total availability = availability(A) * availability(B)
 - For components in parallel: Total availability = 1 - (1 - Availability (A)) * (1 - Availability (B))
-
 - [Scalability, availability and stability patterns](https://www.slideshare.net/jboner/scalability-availability-stability-patterns)
   
 ## DNS
@@ -151,15 +150,13 @@
     - Now, the top-level name servers are the **com** name servers or the **TLD (Top Level Domain) Name servers**. The root name servers reply with a response (Do not know the IP but do know the com name servers). So, the resolving name server takes the info from the root name server, puts it in the cache, and goes to the com name server. When the resolving name server goes to the com name server, it replies with the address of the **example.com name servers**. Now, the resolving name server takes this info and goes to the example.com name servers. These are the **Authoritative Name servers** for this particular domain name.
     - **How did the com TLD name servers know which authoritative name servers to use?** It does so with the help of the **Domain Registrar.** When a domain is purchased, the registrar is told which authoritative name servers that domain should use. The resolving name server takes the response from the TLD, queries the example.com name server. This server gets the IP from the authoritative name server, puts it in the cache, and gives it to the OS. The browser then gets the IP from the OS. The whole process works in the blink of an eye!
 - DNS Explained: [https://www.youtube.com/watch?v=72snZctFFtA](https://www.youtube.com/watch?v=72snZctFFtA)
-- AWS ReInvent talk on DNS: [https://www.youtube.com/watch?v=e2xLV7pCOLI](https://www.youtube.com/watch?v=e2xLV7pCOLI) (watch first 6 minutes)
-    - 
+- AWS ReInvent talk on DNS: [https://www.youtube.com/watch?v=e2xLV7pCOLI](https://www.youtube.com/watch?v=e2xLV7pCOLI)
 
-        ![Image 5](../assets/5.png)
+    ![Image 5](../assets/5.png)
 
 - DNS Zone - It is a specific portion of the DNS namespace that is managed by an organization or administrator. A DNS zone starts at a domain within the tree and can also extend down into subdomains so that multiple subdomains can be managed by one entity.
-    - 
-
-        ![Image 6](../assets/6.png)
+    
+    ![Image 6](../assets/6.png)
 
     - **DNS Zone file -** A text file that contains an actual representation of the zone and contains all the records that exist for all the domains within that zone. They always start with a Start of Authority (SOA) record containing important info about the zone administrator.
 - Routing traffic through different mechanisms -
@@ -195,7 +192,7 @@
     - At its core, its a network of servers linked together with the goal of delivering content quickly, reliably and securely. It places servers at the exchange points between different networks.
     - These Internet Exchange Points (An Internet exchange point (IXP) is a physical location through which Internet infrastructure companies such as Internet Service Providers (ISPs) and [CDN](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/)s connect with each other. These locations exist on the [“edge” of different networks](https://www.cloudflare.com/learning/cdn/glossary/edge-server/),) are primary locations where different networks connect to give each other access to traffic originating from their respective networks. By having access to these high speed locations a CDN provider is capable of reducing costs and transit times for data.
 
-    ![Image 7](../assets/7.png)
+        ![Image 7](../assets/7.png)
 
 - **How does CDN improve load times -**
     - **Reduces distance between users and website resources**. It connects the users to a geographically closer data center. Less travel, faster service.
@@ -206,8 +203,7 @@
     - **Load balancing** distributes traffic across CDN servers evenly - this helps in handling sudden spikes in traffic.
     - **Intelligent Failover** - even if one or more CDN servers go offline, the failover can redistribute the traffic to other operational servers.
     - If an entire data center is down, **Anycast routing** transfers traffic to another available data center. (Most of the internet works on unicast - means that all the requests are directed to a specific data center. When anycast is used, the network is more resilient especially in cases of a DDoS attack, because, the traffic will find the best path and will automatically flow to a proximal other data center)
-    - 
-
+        
         ![Image 8](../assets/8.png)
 
 ## Load Balancer
