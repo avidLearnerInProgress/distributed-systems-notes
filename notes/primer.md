@@ -259,3 +259,55 @@
     - More complexity.
     - Single reverse proxy - Single point of failure
 - **Load balancer vs Reverse proxy - Load balancer is designed to route traffic to different servers whereas reverse proxy works as a camouflaging layer to not expose the actual backend servers.**
+
+
+## Databases
+
+- RDBMS
+    - Data stored in table like structures.
+    - ACID - properties of relational databases
+        - **Atomicity** - Each transaction is all or nothing
+        - **Consistency** - Any transaction will bring the database from one valid state to another
+        - **Isolation** - Executing transactions concurrently has the same results as if the transactions were executed serially
+        - **Durability** - Once a transaction has been committed, it will remain so.
+    - Scaling relational databases -
+        - Master - slave replication: Refer [Partition inside CAP Theorm & CA Patterns](#CAP-Theorem-And-CA-Patterns)
+        - Master - master replication: Refer [Partition inside CAP Theorm & CA Patterns](#CAP-Theorem-And-CA-Patterns)
+            - **Split brain problem in Master - master replication:**
+                - In master-master architecture, both the DBs read and write data. If one fails the other one takes over the requests. However, what if the communication channel between them fails due to network partition? In this case both accept writes and the data between them is not synced. This can be resolved by introducing a third node between them. It sort of solves the problem.
+                - Consider there are 3 copies, all being in sync with one another -
+
+                    ![Image 10](../assets/10.png)
+
+                - The link between A and B breaks. Now, when a request Sx is sent to A, it is unable to sync with B. It syncs with C and now C is at state Sx. When a request is sent to B, it fails to send it to A. It attempts to sync it with C, however it fails because B is at state Sx and C is at state S0. There is an inconsistency in their previous states. Hence, the the request Sy is rolled back and B first syncs with C to attain state Sx. The user then sends the request Sy again and B attains state Sy, syncs it to C. When A gets a new requests, it syncs with C in a similar way. Hence, A, B, C agree to a certain state.
+                - When multiple entities agree to a certain value, it is called **distributed consensus**. There are many protocols for distributed consensus: 2-Phase Commit, 3-Phase commit, Multi-Version Concurrency Control (Postgres), SAGA (Microsoft)
+                - Links for distributed consensus algorithms -
+                    - [Let's take a crack at understanding distributed consensus](https://www.preethikasireddy.com/post/lets-take-a-crack-at-understanding-distributed-consensus)
+                    - [Distributed Systems Consensus algorithms](https://www.youtube.com/watch?v=Gi1yrW8_EPk)
+                    - Consensus in distributed systems - [[Talk link](https://www.youtube.com/watch?v=sTfoPjY3Olg)] [[Slides link](https://docs.google.com/presentation/d/1jTjmm_unV6e-zU1keB-14W0ReykwfyVdPp5z6PBj57c/edit#slide=id.p)]
+        - **Database Federation**
+            - Split the databases by function. For example, instead of having a single monolith database, we can have three different databases for users, products, and forums. [Not really confident in this definition]
+            - This results in less read and write traffic and reduces the replication lag.
+            - More data can fit in memory and gives more cache hits due to better cache locality.
+            - Write in parallel and increase throughput.
+            - **Disadvantages:**
+                - Update application logic to determine which database to query.
+                - Not effective when the schema needs huge functions or tables.
+                - Adds more hardware and complexity.
+                - Joining data (across databases) becomes complex.
+        - **Database Partitioning**
+            - **Partitioning** means *Dividing data accross tables or databases.*
+            - Partitioning methods:
+                - **Horizontal Partitioning** - ***Involves putting different rows into different tables***. Perhaps customers with ZIP codes less than 50000 are stored in CustomersEast, while customers with ZIP codes greater than or equal to 50000 are stored in CustomersWest. The two partition tables are then CustomersEast and CustomersWest, while a view with a union might be created over both of them to provide a complete view of all customers.
+                - **Vertical Partitioning** - ***Involves creating tables with fewer columns and using additional tables to store remaining columns.***
+                    - **Normalization -** The process of removing redundant columns from a table and putting them in secondary tables that are linked to the primary table by primary key and foreign key relationships.
+                    - **Row splitting** - Divides the original table vertically into tables with fewer columns. Each logical row in a split-table matches the same logical row in the other tables as identified by a UNIQUE KEY column that is identical in all of the partitioned tables.
+                - **Benefits of partitioning -**
+                    - Indexes are smaller (quick index scans)
+                    - Allows DB optimizer to sequence scan the partition instead of index
+                    - Split the table by columns (vertically) and put the columns with the entire slice into another table (blobs)
+                    - Example fields that are blobs can be put in another table in another tablespace that is stored in HDD vs the rest of the data goes to your SSD.
+                - [Wiki article](https://en.wikipedia.org/wiki/Partition_%28database%29)
+                - [Hussain's video on partitioning](https://www.youtube.com/watch?v=QA25cMWp9Tk)
+                - [SF answer](https://stackoverflow.com/questions/18302773/what-are-horizontal-and-vertical-partitions-in-database-and-what-is-the-differen/18302815)
+                - [SF answer 2](https://stackoverflow.com/questions/20388923/database-partitioning-horizontal-vs-vertical-difference-between-normalizatio)
