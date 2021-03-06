@@ -8,9 +8,9 @@
 - [x] [CDN](./notes/primer.md#CDN)
 - [x] [Load Balancer](./notes/primer.md#Load-Balancer)
 - [x] [Reverse Proxy](./notes/primer.md#Reverse-Proxy)
+- [x] [Databases](./notes/primer.md#Databases)
 
 ## Todo -
 
-- [x] DNS articles pending
-- [ ] Databases + sharding pending
+- [ ] Database indexes, nosql vs sql(performancem tuning etc..), sharding, ...
 - [ ] Clean up the research papers section with a separate readme
