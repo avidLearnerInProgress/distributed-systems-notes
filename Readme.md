@@ -12,5 +12,6 @@
 
 ## Todo -
 
-- [ ] Database indexes, nosql vs sql(performancem tuning etc..), sharding, ...
+- [ ] Database indexes, sharding
+- [ ] Database Partitioning techniques
 - [ ] Clean up the research papers section with a separate readme
