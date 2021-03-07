@@ -294,10 +294,13 @@
         - **Database Partitioning**
             - **Partitioning** means *Dividing data accross tables or databases.*
             - Partitioning methods:
-                - **Horizontal Partitioning** - ***Involves putting different rows into different tables***. Perhaps customers with ZIP codes less than 50000 are stored in CustomersEast, while customers with ZIP codes greater than or equal to 50000 are stored in CustomersWest. The two partition tables are then CustomersEast and CustomersWest, while a view with a union might be created over both of them to provide a complete view of all customers.
-                - **Vertical Partitioning** - ***Involves creating tables with fewer columns and using additional tables to store remaining columns.***
+                - **Horizontal Partitioning -** ***Involves putting different rows into different tables***. Perhaps customers with ZIP codes less than 50000 are stored in CustomersEast, while customers with ZIP codes greater than or equal to 50000 are stored in CustomersWest. The two partition tables are then CustomersEast and CustomersWest, while a view with a union might be created over both of them to provide a complete view of all customers.  **Each partition has the same schema and columns but different rows. Likewise, the data held in each is unique and independent of the data held in other partitions.**
+                - **Vertical Partitioning** - ***Involves creating tables with fewer columns and using additional tables to store remaining columns.* The data held within one vertical partition is independent of the data in all the others, and each holds both distinct rows and columns.** It is almost always implemented at the application level — a piece of code routing reads and writes to a designated database.
                     - **Normalization -** The process of removing redundant columns from a table and putting them in secondary tables that are linked to the primary table by primary key and foreign key relationships.
                     - **Row splitting** - Divides the original table vertically into tables with fewer columns. Each logical row in a split-table matches the same logical row in the other tables as identified by a UNIQUE KEY column that is identical in all of the partitioned tables.
+
+                    ![Image 11](../assets/11.png)
+
                 - **Benefits of partitioning -**
                     - Indexes are smaller (quick index scans)
                     - Allows DB optimizer to sequence scan the partition instead of index
@@ -305,5 +308,60 @@
                     - Example fields that are blobs can be put in another table in another tablespace that is stored in HDD vs the rest of the data goes to your SSD.
                 - [Wiki article](https://en.wikipedia.org/wiki/Partition_%28database%29)
                 - [Hussain's video on partitioning](https://www.youtube.com/watch?v=QA25cMWp9Tk)
-                - [SF answer](https://stackoverflow.com/questions/18302773/what-are-horizontal-and-vertical-partitions-in-database-and-what-is-the-differen/18302815)
-                - [SF answer 2](https://stackoverflow.com/questions/20388923/database-partitioning-horizontal-vs-vertical-difference-between-normalizatio)
+                - [Difference between Horizonatal vs Vertical partitioning - StackOverflow answer](https://stackoverflow.com/questions/18302773/what-are-horizontal-and-vertical-partitions-in-database-and-what-is-the-differen/18302815)
+                - [Difference between Normalization and Row Splitting in Vertical Paritioning - StackOverflow answer](https://stackoverflow.com/questions/20388923/database-partitioning-horizontal-vs-vertical-difference-between-normalizatio)
+        - **Database Sharding(based on Horizontal partitioning)**
+            - **Sharding involves breaking up one’s data into two or smaller chunks, called logical shards**. **The logical shards are then distributed across separate database nodes, referred to as physical shards, which can hold multiple logical shards**. Despite this, the data held within all the shards collectively represent an entire logical dataset.
+            - Database shards exemplify a *[shared-nothing architecture](https://en.wikipedia.org/wiki/Shared-nothing_architecture)*. This means that the shards are autonomous; they don’t share any of the same data or computing resources. In some cases, though, it may make sense to replicate certain tables into each shard to serve as **reference tables.** For example, let’s say there’s a database for an application that depends on fixed conversion rates for weight measurements. By replicating a table containing the necessary conversion rate data into each shard, it would help to ensure that all of the data required for queries is held in every shard.
+            - **Shard or Partition Key is a portion of the primary key that determines how data should be distributed**. A partition key allows you to retrieve and modify data efficiently by routing operations to the correct database. Entries with the same partition key are stored in the same node. **A logical shard** is a collection of data sharing the same partition key. A database node, sometimes referred to as a **physical shard**, contains multiple logical shards.
+            - **Sharding splits a homogeneous type of data into multiple databases**. You can see that such an algorithm is easily generalizable. That’s why sharding can be implemented at either the application or database level. In many databases, sharding is a first-class concept, and the database knows how to store and retrieve data within a cluster. Almost all modern databases are natively sharded. Cassandra, HBase, HDFS, and MongoDB are popular distributed databases. Notable examples of non-sharded modern databases are Slite, Redis (spec in progress), Memcached, and Zookeeper.
+            - Oftentimes, sharding is implemented at the application level, meaning that the application includes code that defines which shard to transmit reads and writes to. However, many database management systems have sharding capabilities built-in, allowing you to implement sharding directly at the database level.
+            - **Benefits**:
+                - Scale out - horizontal scaling
+                - Makes setup more flexible
+                - Speed up query response times (You don't need to search through entire database and the query does a lookup on the respective shard based on partition key and query parameters)
+                - Makes applications more reliable by mitigating the impact of outages.
+            - **Drawbacks:**
+                - Sharding a database table before it has been optimized locally causes premature complexity. Sharding should be used only when all other options for optimization are inadequate
+                - Adds additional [programming and operational complexity](http://www.percona.com/blog/2009/08/06/why-you-dont-want-to-shard/) to the application.
+                - Databases become less convenient in terms of accessing when it is spread across multiple tables. Operations may need to search through many databases to retrieve data. These queries are called **cross-partition operations** and they tend to be inefficient.
+                - We can have an uneven distribution of data and operations on a particular shard(**Hotspots)**
+                - It's very difficult to rollback a sharded database to a non-sharded one.
+                - Sharding often requires a “roll your own” approach. This means that documentation for sharding or tips for troubleshooting problems are often difficult to find.
+                - SQL complexity - Increased bugs because the developers have to write more complicated SQL to handle sharding logic.
+                - Additional software - that partitions, balances, coordinates, and ensures integrity can fail.
+                - Single point of failure - Corruption of one shard due to network/hardware/systems problems causes failure of the entire table.
+                - Fail-over server complexity - Fail-over servers must have copies of the fleets of database shards.
+                - Backups complexity - Database backups of the individual shards must be coordinated with the backups of the other shards.
+                - Operational complexity - Adding/removing indexes, adding/deleting columns, modifying the schema becomes much more difficult.
+            - **When to shard and when not to?**
+            - **Sharding schemes**
+                - **Algorithmic Sharding**
+
+                    ![Image 12](../assets/12.png)
+
+                    - Algorithmically sharded databases use a sharding function (partition_key) -> database_id to locate data. A simple sharding function may be “hash(key) % NUM_DB”.
+                    - Here, each key **consistently maps** to the same node. We can do it by computing a numeric hash value out of the key and computing a modulo of that hash using the total number of nodes to compute which node owns the key.
+                    - Reads are performed within a single database as long as a partition key is given. Queries without a partition key require searching every database node. Non-partitioned queries do not scale with respect to the size of the cluster, thus they are discouraged.
+                    - Algorithmic sharding distributes data by its sharding function only. It doesn’t consider the payload size or space utilization.  To uniformly distribute data, each partition should be similarly sized.
+                    - **Pros** - In algorithmic sharding, the client can determine a given partition’s database without any help from an external service. Algorithmic sharding is suitable for key-value databases with homogeneous values.
+                    - **Cons** - When a new node is added or removed, the ownership of almost all keys would be affected, resulting in a massive redistribution of all the data across nodes of the cluster. While this is not a correctness issue in a distributed cache (because cache misses will repopulate the data), it can have a huge performance impact since the entire cache will have to be warmed again.
+                    - Examples of such a system include Memcached. Memcached is not sharded on its own but expects client libraries to distribute data within a cluster. Such logic is fairly easy to implement at the application level.  ⇒  [Sharding data across a Memcache tier](https://www.linuxjournal.com/article/7451)
+                - **Dynamic Sharding**
+
+                    ![Image 13](../assets/13.png)
+
+                    - Here, we have an external locator service that determines the location of records in respective shards. If the cardinality of partition keys is low, the locator can be assigned per key. But in the general case, we have a single locator that addresses a range of partition keys.
+
+                    ![Image 14](../assets/14.png)
+
+                    (Remaining...)
+
+                - [How sharding works](https://medium.com/@jeeyoungk/how-sharding-works-b4dec46b3f6)
+                - [Data sharding in distributed SQL database](https://blog.yugabyte.com/how-data-sharding-works-in-a-distributed-sql-database/)
+                - [Understanding database sharding](https://www.digitalocean.com/community/tutorials/understanding-database-sharding)
+                - [Principles of Sharding](https://www.citusdata.com/blog/2017/08/09/principles-of-sharding-for-relational-databases/)
+                - [Why you dont want to shard by Percona](https://www.percona.com/blog/2009/08/06/why-you-dont-want-to-shard/)
+                - [Unorthodox approach to database design](http://highscalability.com/blog/2009/8/6/an-unorthodox-approach-to-database-design-the-coming-of-the.html)
+                - Why shard or partition a database
+            - [Sharding vs Horizontal Partitioning](https://stackoverflow.com/questions/20771435/database-sharding-vs-partitioning)
