@@ -12,6 +12,5 @@
 
 ## Todo -
 
-- [ ] Database indexes, sharding
-- [ ] Database Partitioning techniques
+- [ ] Database indexing
 - [ ] Clean up the research papers section with a separate readme
