@@ -334,7 +334,13 @@
                 - Fail-over server complexity - Fail-over servers must have copies of the fleets of database shards.
                 - Backups complexity - Database backups of the individual shards must be coordinated with the backups of the other shards.
                 - Operational complexity - Adding/removing indexes, adding/deleting columns, modifying the schema becomes much more difficult.
-            - **When to shard and when not to?**
+            - **When to shard?**
+                - You should shard only when you have tried the following first because sharding is a really complex operation.
+                    - Vertical scaling has reached its limits.
+                    - Horizontal partitioning doesn't work
+                    - If the app is read-heavy; you can use imtermediary caches
+                    - For scaling the writes, once you shard, you will sacrifice rollbacks, commits, transactions, and the ACID properties of databases.
+                    - **How the data is read***(If we don’t need to read data at all, we can simply write it to /dev/null. If we only need to batch process the data once in a while, we can append to a single file and periodically scan through them)* & **How data is distributed**(*Once you have a cluster of machines acting together, it is important to ensure that data and work is evenly distributed. Uneven load causes storage and performance hotspots. Some databases redistribute data dynamically, while others expect clients to evenly distribute and access data.*) are important principles while deciding on sharding strategies.**When to shard and when not to?**
             - **Sharding schemes**
                 - **Algorithmic Sharding**
 
@@ -349,19 +355,22 @@
                     - Examples of such a system include Memcached. Memcached is not sharded on its own but expects client libraries to distribute data within a cluster. Such logic is fairly easy to implement at the application level.  ⇒  [Sharding data across a Memcache tier](https://www.linuxjournal.com/article/7451)
                 - **Dynamic Sharding**
 
-                    ![Image 13](../assets/13.png)
-
+                    - Range sharding involves splitting the rows of a table into contiguous ranges that respect the sort order of the table based on the primary key column values. The tables that are range-sharded usually start out with a single shard. As data is inserted into the table, it is dynamically split into multiple shards because it is not always possible to know the distribution of keys in the table ahead of time.
                     - Here, we have an external locator service that determines the location of records in respective shards. If the cardinality of partition keys is low, the locator can be assigned per key. But in the general case, we have a single locator that addresses a range of partition keys.
+                        ![Image 13](../assets/13.png)
 
-                    ![Image 14](../assets/14.png)
-
-                    (Remaining...)
-
-                - [How sharding works](https://medium.com/@jeeyoungk/how-sharding-works-b4dec46b3f6)
-                - [Data sharding in distributed SQL database](https://blog.yugabyte.com/how-data-sharding-works-in-a-distributed-sql-database/)
-                - [Understanding database sharding](https://www.digitalocean.com/community/tutorials/understanding-database-sharding)
-                - [Principles of Sharding](https://www.citusdata.com/blog/2017/08/09/principles-of-sharding-for-relational-databases/)
-                - [Why you dont want to shard by Percona](https://www.percona.com/blog/2009/08/06/why-you-dont-want-to-shard/)
-                - [Unorthodox approach to database design](http://highscalability.com/blog/2009/8/6/an-unorthodox-approach-to-database-design-the-coming-of-the.html)
-                - Why shard or partition a database
-            - [Sharding vs Horizontal Partitioning](https://stackoverflow.com/questions/20771435/database-sharding-vs-partitioning)
+                        ![Image 14](../assets/14.png)
+                    
+                    - **Pros -** This type of sharding allows efficiently querying a range of rows by the primary key values. Examples of such a query is to look up all keys that lie between a lower bound and an upper bound.
+                    
+                    - **Cons -**
+                        - When starting out with a single shard implies only a single node is taking all the user queries. This often results in a **database “warming” problem**, where all queries are handled by a single node even if there are multiple nodes in the cluster. The user would have to wait for enough splits to happen and these shards to get redistributed before all nodes in the cluster are being utilized. This can be a big issue in production workloads. This can be mitigated in some cases where the distribution is keys is known ahead of time by pre-splitting the table into multiple shards, however this is hard in practice.
+                        - Globally ordering keys across all the shards often generates hot spots: some shards will get much more activity than others, and the node hosting those will be overloaded relative to others. While these can be mitigated to some extent with active load balancing, this does not always work well in practice because by the time hot shards are redistributed across nodes, the workload could change and introduce new hot spots.
+            - [How sharding works](https://medium.com/@jeeyoungk/how-sharding-works-b4dec46b3f6)
+            - [Data sharding in distributed SQL database](https://blog.yugabyte.com/how-data-sharding-works-in-a-distributed-sql-database/)
+            - [Understanding database sharding](https://www.digitalocean.com/community/tutorials/understanding-database-sharding)
+            - [Principles of Sharding](https://www.citusdata.com/blog/2017/08/09/principles-of-sharding-for-relational-databases/)
+            - [Four sharding strategies](https://blog.yugabyte.com/four-data-sharding-strategies-we-analyzed-in-building-a-distributed-sql-database/)
+            - [Why you dont want to shard by Percona](https://www.percona.com/blog/2009/08/06/why-you-dont-want-to-shard/)
+            - [Unorthodox approach to database design](http://highscalability.com/blog/2009/8/6/an-unorthodox-approach-to-database-design-the-coming-of-the.html)
+            - Sharding vs Partitioning - [StackOverflow](https://stackoverflow.com/questions/20771435/database-sharding-vs-partitioning) | [Quora](https://www.quora.com/Whats-the-difference-between-sharding-DB-tables-and-partitioning-them?top_ans=950792)
