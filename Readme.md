@@ -1,4 +1,4 @@
-## System Design Primer Notes
+## Introduction
 
 - [x] [Scalability blog posts summary](./notes/primer.md#LeCloud-Posts)
 - [x] [CS75 talk summary](./notes/primer.md#David-Malan's-Scalability-Video)
@@ -9,8 +9,3 @@
 - [x] [Load Balancer](./notes/primer.md#Load-Balancer)
 - [x] [Reverse Proxy](./notes/primer.md#Reverse-Proxy)
 - [x] [Databases](./notes/primer.md#Databases)
-
-## Todo -
-
-- [ ] Database indexing
-- [ ] Clean up the research papers section with a separate readme
